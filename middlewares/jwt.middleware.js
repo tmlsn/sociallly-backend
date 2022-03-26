@@ -1,29 +1,28 @@
-const jwt = require('express-jwt')
-const dotenv = require('dotenv')
-dotenv.config()
+const dotenv = require("dotenv");
+dotenv.config();
 
-// variable to hold the authentication state
-const isAuthenticated = jwt({
-  // sectret jwt key
-  secret: process.env.JWT_SECRET,
-  // jwt alroithm
-  algorithms: ['HS256'],
-  // where the data is
-  requestProperty: 'payload',
-  // function to get the jwt from the request
-  getToken: (req) => {
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.split(' ')[0] === 'Bearer'
-    ) {
-      const token = req.headers.authorization.split(' ')[1]
-      return token
-    } else {
-      return null
-    }
-  },
-})
+const jwt = require("jsonwebtoken");
+
+// we got rid of the old logic of verifying tokens
+
+// better logic to verify the jwt token
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    console.log(err);
+
+    if (err) return res.sendStatus(403);
+
+    req.user = user;
+
+    next();
+  });
+}
 
 module.exports = {
-  isAuthenticated,
-}
+  authenticateToken,
+};

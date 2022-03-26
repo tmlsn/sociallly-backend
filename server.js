@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 dotenv.config();
-const { isAuthenticated } = require("./middlewares/jwt.middleware");
+const { authenticateToken } = require("./middlewares/jwt.middleware");
 
 // connect to the database
 mongoose.connect(process.env.MONGO_DB_URL);
@@ -19,18 +19,11 @@ app.use(express.json());
 
 // tweet routes
 const tweetRoutes = require("./routes/tweet.routes");
-app.use("/tweets", isAuthenticated, tweetRoutes);
+app.use("/tweets", authenticateToken, tweetRoutes);
 
 // auth routes
 const authRoutes = require("./routes/auth.routes");
 app.use("/auth", authRoutes);
-
-// middleware for custom erros when JWT is invalid
-app.use((err, req, res, next) => {
-  if (err.name === "UnauthorizedError") {
-    res.status(401).json({ message: "invalid token" });
-  }
-});
 
 // listen to upcoming requests
 app.listen(process.env.PORT);
