@@ -21,5 +21,12 @@ app.use("/tweets", isAuthenticated, tweetRoutes);
 const authRoutes = require("./routes/auth.routes");
 app.use("/auth", authRoutes);
 
+// middleware for custom erros when JWT is invalid
+app.use((err, req, res, next) => {
+  if (err.name === "UnauthorizedError") {
+    res.status(401).json({ message: "invalid token" });
+  }
+});
+
 // listen to upcoming requests
 app.listen(process.env.PORT);
