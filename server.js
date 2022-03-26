@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const cors = require("cors");
 dotenv.config();
 const { isAuthenticated } = require("./middlewares/jwt.middleware");
 
@@ -9,6 +10,9 @@ mongoose.connect(process.env.MONGO_DB_URL);
 
 // create a new express app
 const app = express();
+
+// use cors
+app.use(cors());
 
 // making our server accept json requests
 app.use(express.json());

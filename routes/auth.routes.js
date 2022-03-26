@@ -34,12 +34,12 @@ router.post('/login', async (req, res) => {
         expiresIn: '6h',
       })
       // send the token to the user
-      res.send(token)
+      res.status(200).send(token)
     } else {
-      res.send('email or password are incorrect')
+      res.status(401).send('email or password are incorrect')
     }
   } else {
-    res.send('email or password are incorrect')
+    res.status(401).send('email or password are incorrect')
   }
 })
 
