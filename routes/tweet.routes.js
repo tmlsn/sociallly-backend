@@ -27,13 +27,18 @@ router.get("/:id", async (req, res) => {
 // TODO: you cannot delete a tweet if you are not the owner
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
-  const tweet = await Tweet.findByIdAndDelete(id);
-  res.status(200).json(tweet);
+  const tweet = await Tweet.findById(id);
+  if (tweet.user.toString() === req.jwtPayload.user._id) {
+    await Tweet.findByIdAndDelete(id);
+    res.status(200).json(tweet);
+  } else {
+    res.status(400).json("unauthorized");
+  }
 });
 
 // edit tweet by id
 // TODO: you cannot edit a tweet if you are not the owner
-router.get("/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { content } = req.body;
