@@ -31,7 +31,7 @@ router.post("/login", async (req, res) => {
     if (passwordCorrect) {
       // create a payload
       const payload = {
-        email,
+        user,
       };
       // create a token
       const token = jwt.sign(payload, process.env.JWT_SECRET, {

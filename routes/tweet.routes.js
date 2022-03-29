@@ -6,13 +6,13 @@ const router = express.Router();
 // create tweet
 router.post("/", async (req, res) => {
   const { content } = req.body;
-  const tweet = await Tweet.create({ content });
+  const tweet = await Tweet.create({ content, user: req.jwtPayload.user._id });
   res.status(200).json(tweet);
 });
 
 // get all tweets
 router.get("/", async (req, res) => {
-  const tweets = await Tweet.find();
+  const tweets = await Tweet.find().populate("user");
   res.status(200).json(tweets);
 });
 
@@ -24,6 +24,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // delete tweet by id
+// TODO: you cannot delete a tweet if you are not the owner
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   const tweet = await Tweet.findByIdAndDelete(id);
@@ -31,6 +32,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 // edit tweet by id
+// TODO: you cannot edit a tweet if you are not the owner
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
