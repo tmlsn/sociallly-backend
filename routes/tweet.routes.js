@@ -39,14 +39,18 @@ router.delete("/:id", async (req, res) => {
 // edit tweet by id
 // TODO: you cannot edit a tweet if you are not the owner
 router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { content } = req.body;
-    const tweet = await Tweet.findByIdAndUpdate(id, { content }, { new: true });
+  const { id } = req.params;
+  const { content } = req.body;
+  let tweet = await Tweet.findById(id)
+  if (tweet.user.toString() === req.jwtPayload.user._id) {
+    tweet.content = content
+    tweet = await tweet.save()
     res.status(200).json(tweet);
-  } catch (err) {
-    res.status(500).json(err);
+  } else {
+    res.status(400).json("unauthorized");
   }
+  //const tweet = await Tweet.findByIdAndUpdate(id, { content }, { new: true });
+  //res.status(200).json(tweet);
 });
 
 module.exports = router;
