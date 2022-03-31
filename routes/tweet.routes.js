@@ -24,29 +24,28 @@ router.get("/:id", async (req, res) => {
 });
 
 // delete tweet by id
-// TODO: you cannot delete a tweet if you are not the owner
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
-  const currentUser = req.jwtPayload.user._id
-  if(currentUser === req.body.user){
-  const tweet = await Tweet.findByIdAndDelete(id);
-  res.status(200).json(tweet);
-} else { res.send("You are not the author of that tweet.")}
+  const tweet = await Tweet.findById(id);
+  if (tweet.user.toString() === req.jwtPayload.user._id) {
+    await Tweet.findByIdAndDelete(id);
+    res.status(200).json(tweet);
+  } else {
+    res.status(400).json("unauthorized");
+  }
 });
 
 // edit tweet by id
-// TODO: you cannot edit a tweet if you are not the owner
 router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { content } = req.body;
-    const currentUser = req.jwtPayload.user._id
-    if (currentUser === req.body.user){
-      const tweet = await Tweet.findByIdAndUpdate(id, { content }, { new: true });
+  const { id } = req.params;
+  const { content } = req.body;
+  let tweet = await Tweet.findById(id);
+  if (tweet.user.toString() === req.jwtPayload.user._id) {
+    tweet.content = content;
+    tweet = await tweet.save();
     res.status(200).json(tweet);
-  } else { res.send("You are not the author of that tweet.")}
-  } catch (err) {
-    res.status(500).json(err);
+  } else {
+    res.status(400).json("unauthorized");
   }
 });
 
